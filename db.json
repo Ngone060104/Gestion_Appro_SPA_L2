@@ -1,0 +1,81 @@
+{
+  "categories": [
+    {
+      "id": "cat-1",
+      "libelle": "Accessoires informatiques"
+    },
+    {
+      "id": "cat-2",
+      "libelle": "Alimentation"
+    },
+    {
+      "id": "Py_hWyW9bos",
+      "libelle": "Informatique"
+    },
+    {
+      "id": "KuuBUGErqiE",
+      "libelle": "Habillement"
+    },
+    {
+      "id": "knybnCWpdEE",
+      "libelle": "Cosmetique"
+    }
+  ],
+  "produits": [
+    {
+      "id": "prod-1",
+      "libelle": "Souris sans fil",
+      "description": "Souris ergonomique",
+      "prix_unitaire": 4000,
+      "quantite": 100,
+      "categorieId": "cat-1",
+      "imageUrl": "https://res.cloudinary.com/dzrlqv7sk/image/upload/v1781796058/w8urpnm8zaxgohn0gggf.jpg"
+    },
+    {
+      "id": "prod-2",
+      "libelle": "Clavier mécanique",
+      "description": "Clavier mécanique",
+      "prix_unitaire": 20000,
+      "quantite": 50,
+      "categorieId": "cat-2",
+      "imageUrl": ""
+    },
+    {
+      "id": "prod-3",
+      "libelle": "Écran 24 pouces",
+      "description": "Écran LED 24 pouces",
+      "prix_unitaire": 15000,
+      "quantite": 75,
+      "categorieId": "cat-1",
+      "imageUrl": "https://unsplash.com"
+    },
+    {
+      "id": "vW0OdwgpCW4",
+      "libelle": "Jallaba",
+      "description": "Une pièce traditionnelle pour la garde-robe contemporaine",
+      "prix_unitaire": 25000,
+      "quantite": 50,
+      "categorieId": "KuuBUGErqiE",
+      "imageUrl": "https://res.cloudinary.com/dzrlqv7sk/image/upload/v1781702665/hmazfl7qoqbqflqcsamr.jpg"
+    },
+    {
+      "id": "Dm3niF4CECA",
+      "libelle": "Jus de Fruit Local",
+      "description": "100% naturelles",
+      "prix_unitaire": 1500,
+      "quantite": 100,
+      "categorieId": "cat-2",
+      "imageUrl": "https://res.cloudinary.com/dzrlqv7sk/image/upload/v1781703375/nfooldqb8o2cdjhcygnd.jpg"
+    },
+    {
+      "id": "FTHEHUCpafU",
+      "libelle": "kawass",
+      "description": "GFJJGHF",
+      "prix_unitaire": 100,
+      "quantite": 10,
+      "categorieId": "KuuBUGErqiE",
+      "imageUrl": "https://res.cloudinary.com/dzrlqv7sk/image/upload/v1781796017/jr4lteynmrq4pirchdr3.png"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
