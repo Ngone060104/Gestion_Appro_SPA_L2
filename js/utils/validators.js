@@ -19,11 +19,6 @@ export function required(value, message) {
 
 //   return errors;
 // }
-export function required(value, message) {
-  if (!String(value ?? "").trim()) {
-    throw new Error(message);
-  }
-}
 
 export function validateForm(data, rules) {
   const errors = {};
