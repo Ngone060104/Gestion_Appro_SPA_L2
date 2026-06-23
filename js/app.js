@@ -40,7 +40,7 @@ function startApp() {
   mountLayout();
   const sidebar = initSidebar();
   initNavigation(sidebar);
-  navigate("categories");
+  // navigate("categories");
 }
 
 startApp();
