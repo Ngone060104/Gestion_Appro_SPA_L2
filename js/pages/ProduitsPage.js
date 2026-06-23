@@ -303,12 +303,17 @@ export async function renderProduitsPage() {
   const app = document.getElementById("app");
   const produits = await getProduits();
 
+  const produitsAvecCategorie = produits.map((prod) => {
+    const cat = categories.find((c) => c.id === prod.categorieId);
+    return { ...prod, categorieLibelle: cat ? cat.libelle : prod.categorieId };
+  });
+
     // Calcul de la pagination
-  const totalPages = Math.max(1, Math.ceil(produits.length / PRODUITS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(produitsAvecCategorie.length / PRODUITS_PER_PAGE));
   if (produitCurrentPage > totalPages) produitCurrentPage = totalPages;
  
   const startIndex = (produitCurrentPage - 1) * PRODUITS_PER_PAGE;
-  const produitsPage = produits.slice(startIndex, startIndex + PRODUITS_PER_PAGE);
+  const produitsPage = produitsAvecCategorie.slice(startIndex, startIndex + PRODUITS_PER_PAGE);
 
   app.innerHTML = `
     <section>
@@ -325,7 +330,7 @@ export async function renderProduitsPage() {
         <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h2 class="text-xl font-black text-slate-950">Liste des produits</h2>
-            <p class="text-sm text-slate-500">${produits.length} produit(s) enregistré(s).</p>
+            <p class="text-sm text-slate-500">${produitsAvecCategorie.length} produit(s) enregistré(s).</p>
           </div>
 
           <div class="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
@@ -342,12 +347,12 @@ export async function renderProduitsPage() {
 
  
           ${produitViewMode === "table" ? renderProduitsTable(produitsPage) : renderProduitsCards(produitsPage)}
-         ${renderPagination(produits.length, produitCurrentPage, PRODUITS_PER_PAGE)}
+         ${renderPagination(produitsAvecCategorie.length, produitCurrentPage, PRODUITS_PER_PAGE)}
       </article>
     </section>
   `;
 
-  bindProduitEvents(produits);
+  bindProduitEvents(produitsPage);
 }
 
 function bindProduitEvents(produits) {
