@@ -340,7 +340,9 @@ export async function renderProduitsPage() {
           </div>
         </div>
 
-        ${produitViewMode === "table" ? renderProduitsTable(produits) : renderProduitsCards(produits)}
+ 
+          ${produitViewMode === "table" ? renderProduitsTable(produitsPage) : renderProduitsCards(produitsPage)}
+         ${renderPagination(produits.length, produitCurrentPage, PRODUITS_PER_PAGE)}
       </article>
     </section>
   `;
