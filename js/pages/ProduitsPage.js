@@ -4,7 +4,7 @@ import { openModal, openConfirm } from "../components/modal.js";
 import { showToast } from "../components/toast.js";
 import { escapeHtml } from "../utils/html.js";
 // (Vérifiez le chemin exact selon l'emplacement de votre fichier de routage, par exemple "../router.js" ou "../app.js")
-
+import { validateForm } from "../utils/validators.js";
 import {
   createProduit,
   deleteProduit,
@@ -96,50 +96,57 @@ function openProduitForm(produit = null) {
       const categorieId = inputCategorie.value;
       const uploadimage = inputFile.value;
 
-      let isValid = true;
+     // Réinitialiser les messages d'erreur et bordures avant chaque validation
+      modal.querySelectorAll("[id^='error-']").forEach((p) => p.classList.add("hidden"));
+      modal.querySelectorAll("input, select").forEach((el) =>
+        el.classList.remove("border-rose-500", "focus:ring-rose-100")
+      );
 
-      // Réinitialiser les messages d'erreur et bordures avant chaque validation
-      modal.querySelectorAll("[id^='error-']").forEach(p => p.classList.add("hidden"));
-      modal.querySelectorAll("input, select").forEach(el => el.classList.remove("border-rose-500", "focus:ring-rose-100"));
+      // Validation via validateForm (générique avec règles personnalisées)
+      const errors = validateForm(
+        {
+          produitLibelle: libelle,
+          produitPrix: prix_unitaire,
+          produitQuantite: quantite,
+          produitCategorie: categorieId,
+          produitImage: inputFile.files.length,
+        },
+        {
+          produitLibelle: {
+            message: "Le libellé est obligatoire.",
+          },
+          produitPrix: {
+            message: "Doit être supérieur à 0.",
+            validate: (value) => value && parseFloat(value) > 0,
+          },
+          produitQuantite: {
+            message: "Ne peut pas être négative.",
+            validate: (value) => value !== "" && parseInt(value) >= 0,
+          },
+          produitCategorie: {
+            message: "La catégorie est obligatoire.",
+          },
+          produitImage: {
+            message: "L'image du produit est obligatoire.",
+            validate: (value) => produit || value > 0,
+          },
+        }
+      );
 
-
-      // Validation Libellé
-      if (!libelle) {
-        modal.querySelector("#error-produitLibelle").classList.remove("hidden");
-        inputLibelle.classList.add("border-rose-500", "focus:ring-rose-100");
-        isValid = false;
+      if (Object.keys(errors).length > 0) {
+        for (const field in errors) {
+          const errorEl = modal.querySelector(`#error-${field}`);
+          const inputEl = modal.querySelector(`#${field}`);
+          if (errorEl) {
+            errorEl.textContent = errors[field];
+            errorEl.classList.remove("hidden");
+          }
+          if (inputEl) {
+            inputEl.classList.add("border-rose-500", "focus:ring-rose-100");
+          }
+        }
+        return false;
       }
-
-      // Validation Prix unitaire
-      if (!prix_unitaire || parseFloat(prix_unitaire) <= 0) {
-        modal.querySelector("#error-produitPrix").classList.remove("hidden");
-        inputPrix.classList.add("border-rose-500", "focus:ring-rose-100");
-        isValid = false;
-      }
-
-      // Validation Quantité
-      if (!quantite || parseInt(quantite) < 0) {
-        modal.querySelector("#error-produitQuantite").classList.remove("hidden");
-        inputQuantite.classList.add("border-rose-500", "focus:ring-rose-100");
-        isValid = false;
-      }
-
-      // Validation Catégorie
-      if (!categorieId) {
-        modal.querySelector("#error-produitCategorie").classList.remove("hidden");
-        inputCategorie.classList.add("border-rose-500", "focus:ring-rose-100");
-        isValid = false;
-      }
-
-      // Validation Image :
-      if (!produit && (!inputFile || inputFile.files.length === 0)) {
-        const errorImg = modal.querySelector("#error-produitImage");
-        if (errorImg) errorImg.classList.remove("hidden");
-        inputFile.classList.add("border-rose-500", "focus:ring-rose-100");
-        isValid = false;
-      }
-
-      if (!isValid) return false;
 
       try {
 
