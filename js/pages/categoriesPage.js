@@ -3,6 +3,7 @@ import { renderTable } from "../components/table.js";
 import { openModal, openConfirm } from "../components/modal.js";
 import { showToast } from "../components/toast.js";
 import { escapeHtml } from "../utils/html.js";
+import { validateForm } from "../utils/validators.js";
 import {
   createCategorie,
   deleteCategorie,
@@ -20,6 +21,51 @@ function categorieFormBody(categorie) {
   `;
 }
 
+// function openCategorieForm(categorie = null) {
+//   openModal({
+//     title: categorie ? "Modifier la catégorie" : "Nouvelle catégorie",
+//     icon: "fa-tag",
+//     body: categorieFormBody(categorie),
+//     confirmLabel: categorie ? "Enregistrer" : "Créer",
+//     onConfirm: async (modal) => {
+//       // 1. Sélection correcte des éléments du DOM
+//       const inputLibelle = modal.querySelector("#categorieLibelle");
+
+//         // 2. Extraction des valeurs propres
+//       const libelle = inputLibelle.value.trim();
+
+//         let isValid = true;
+
+//        // Réinitialiser les messages d'erreur et bordures avant chaque validation
+//       modal.querySelectorAll("[id^='error-']").forEach(p => p.classList.add("hidden"));
+//        inputLibelle.classList.remove("border-rose-500", "focus:ring-rose-100");
+//             // Validation Libellé
+//       if (!libelle) {
+//         modal.querySelector("#error-categorieLibelle").classList.remove("hidden");
+//         inputLibelle.classList.add("border-rose-500", "focus:ring-rose-100");
+//         isValid = false;
+//       }
+//         if (!isValid) return false; 
+
+//       try {
+//         if (categorie) {
+//           await updateCategorie(categorie.id, { libelle });
+//           showToast("Catégorie modifiée avec succès.");
+//         } else {
+//           await createCategorie({ libelle });
+//           showToast("Catégorie créée avec succès.");
+//         }
+
+//         await renderCategoriesPage();
+//         return true;
+//       } catch (error) {
+//         showToast(error.message, "error");
+//         return false;
+//       }
+//     },
+//   });
+// }
+
 function openCategorieForm(categorie = null) {
   openModal({
     title: categorie ? "Modifier la catégorie" : "Nouvelle catégorie",
@@ -30,21 +76,36 @@ function openCategorieForm(categorie = null) {
       // 1. Sélection correcte des éléments du DOM
       const inputLibelle = modal.querySelector("#categorieLibelle");
 
-        // 2. Extraction des valeurs propres
+      // 2. Extraction des valeurs propres
       const libelle = inputLibelle.value.trim();
 
-        let isValid = true;
+      // 3. Réinitialiser les messages d'erreur et bordures avant chaque validation
+      modal.querySelectorAll("[id^='error-']").forEach((p) => p.classList.add("hidden"));
+      inputLibelle.classList.remove("border-rose-500", "focus:ring-rose-100");
 
-       // Réinitialiser les messages d'erreur et bordures avant chaque validation
-      modal.querySelectorAll("[id^='error-']").forEach(p => p.classList.add("hidden"));
-       inputLibelle.classList.remove("border-rose-500", "focus:ring-rose-100");
-            // Validation Libellé
-      if (!libelle) {
-        modal.querySelector("#error-categorieLibelle").classList.remove("hidden");
-        inputLibelle.classList.add("border-rose-500", "focus:ring-rose-100");
-        isValid = false;
+      // 4. Validation via validateForm (générique)
+      const errors = validateForm(
+        { categorieLibelle: libelle },
+        {
+          categorieLibelle: { message: "Le libellé est obligatoire." },
+        }
+      );
+
+      // 5. Affichage des erreurs s'il y en a
+      if (Object.keys(errors).length > 0) {
+        for (const field in errors) {
+          const errorEl = modal.querySelector(`#error-${field}`);
+          const inputEl = modal.querySelector(`#${field}`);
+          if (errorEl) {
+            errorEl.textContent = errors[field];
+            errorEl.classList.remove("hidden");
+          }
+          if (inputEl) {
+            inputEl.classList.add("border-rose-500", "focus:ring-rose-100");
+          }
+        }
+        return false;
       }
-        if (!isValid) return false; 
 
       try {
         if (categorie) {

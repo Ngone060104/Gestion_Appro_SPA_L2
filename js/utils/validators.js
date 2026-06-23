@@ -5,27 +5,17 @@ export function required(value, message) {
 }
 
 
-export function validateForm(data,currentId=null) {
-    const errors = {};
+export function validateForm(data, rules) {
+  const errors = {};
 
-    if (!data.produitLibelle.trim())
-        errors.produitLibelle = "Le libellé du produit est obligatoire.";
+  for (const field in rules) {
+    const rule = rules[field];
+    const value = String(data[field] ?? "");
 
-    if (!data.produitPrix.trim())
-        errors.produitPrix = "La description du produit est obligatoire.";
+    if (!value.trim()) {
+      errors[field] = rule.message;
+    }
+  }
 
-    if (!data.produitQuantite.trim())
-          errors.produitQuantite = "La quantité du produit est obligatoire.";
-      
-    if (!data.produitCategorie.trim())
-        errors.produitCategorie = "Veuillez choisir une categorie.";
-
-
-    if (!data.produitPrix.trim())
-        errors.produitPrix = "La description du produit est obligatoire.";
-
-    if (!data.produitImage.trim())
-        errors.produitImage= "L'image du produit est obligatoire.";
-
-    return errors;
+  return errors;
 }
