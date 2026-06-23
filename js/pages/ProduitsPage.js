@@ -18,6 +18,8 @@ import { navigate } from "../router.js";
 const categories = await getCategories();
 
 let produitViewMode = "table"; // "table" | "cards"
+let produitCurrentPage = 1;
+const PRODUITS_PER_PAGE = 4;
 
 function produitFormBody(produit) {
   return `
@@ -275,9 +277,38 @@ function renderProduitsCards(produits) {
   </div>`;
 }
 
+function renderPagination(totalItems, currentPage, perPage) {
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+
+  if (totalPages <= 1) return "";
+
+  return `
+    <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+      <p class="text-sm text-slate-500">Page ${currentPage} sur ${totalPages}</p>
+      <div class="flex gap-2">
+        <button id="prevPageBtn" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" ${currentPage === 1 ? "disabled" : ""}>
+          <i class="fa-solid fa-chevron-left"></i>
+          Précédent
+        </button>
+        <button id="nextPageBtn" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" ${currentPage === totalPages ? "disabled" : ""}>
+          Suivant
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 export async function renderProduitsPage() {
   const app = document.getElementById("app");
   const produits = await getProduits();
+
+    // Calcul de la pagination
+  const totalPages = Math.max(1, Math.ceil(produits.length / PRODUITS_PER_PAGE));
+  if (produitCurrentPage > totalPages) produitCurrentPage = totalPages;
+ 
+  const startIndex = (produitCurrentPage - 1) * PRODUITS_PER_PAGE;
+  const produitsPage = produits.slice(startIndex, startIndex + PRODUITS_PER_PAGE);
 
   app.innerHTML = `
     <section>
@@ -318,29 +349,41 @@ export async function renderProduitsPage() {
 }
 
 function bindProduitEvents(produits) {
+  document.getElementById("prevPageBtn")?.addEventListener("click", () => {
+    produitCurrentPage--;
+    renderProduitsPage();
+  });
+ 
+  document.getElementById("nextPageBtn")?.addEventListener("click", () => {
+    produitCurrentPage++;
+    renderProduitsPage();
+  });
+ 
   document.getElementById("viewTableBtn").addEventListener("click", () => {
     produitViewMode = "table";
+    produitCurrentPage = 1;
     renderProduitsPage();
   });
-
+ 
   document.getElementById("viewCardsBtn").addEventListener("click", () => {
     produitViewMode = "cards";
+    produitCurrentPage = 1;
     renderProduitsPage();
   });
-
+ 
   document.getElementById("addProduitBtn").addEventListener("click", () => openProduitForm());
-
+ 
   document.querySelectorAll("[data-edit]").forEach((button) => {
     button.addEventListener("click", () => {
       const produit = produits.find((item) => item.id === button.dataset.edit);
       if (produit) openProduitForm(produit);
     });
   });
-
+ 
   document.querySelectorAll("[data-delete]").forEach((button) => {
     button.addEventListener("click", () => {
       const id = button.dataset.delete;
-
+ 
       openConfirm({
         message: "Voulez-vous supprimer ce produit ?",
         onConfirm: async () => {
